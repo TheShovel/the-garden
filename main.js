@@ -1,20 +1,14 @@
 //audio
-var wind = new Audio("audio/wind.wav");
+const wind = new Audio("audio/wind.wav");
 wind.loop = true;
 wind.volume = 0.5;
 
-var music = new Audio("audio/music.mp3");
+const music = new Audio("audio/music.mp3");
 music.loop = true;
-
-var plantFall = new Audio("audio/fall.wav");
-var plantCollect = new Audio("audio/collect.wav");
-var hitGround = new Audio("audio/hitGround.wav");
-var plantPlant = new Audio("audio/plant.wav");
 
 // elements and stuff
 //
 const body = document.body;
-
 body.style.cssText = `
   user-select: none;
   overflow: hidden;
@@ -37,6 +31,7 @@ document.head.appendChild(styleSheet);
 
 const background = document.createElement("div");
 background.style.cssText = `
+  bottom: 100px;
   user-select: none;
   position: absolute;
   background: white;
@@ -89,9 +84,14 @@ const gardenFrame = document.createElement("div");
 gardenFrame.style.cssText = `
   user-select: none;
   position: absolute;
-  background: grey;
+  background: url(assets/assetsSource/ground.PNG);
   width: 100%;
-  height: 200px;
+  height: 230px;
+  background-size: 108% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  background-position-x: -11px;
+  background-position-y: -250px;
   `;
 background.appendChild(mountain);
 background.appendChild(fence);
@@ -116,7 +116,7 @@ flowersPlantedDisplay.style.cssText = `
   font-family: monospace;
   font-size: 16px;
   `;
-flowersPlantedDisplay.innerText = "click the seed bag";
+flowersPlantedDisplay.innerText = "click the bag";
 statsFrame.appendChild(flowersPlantedDisplay);
 const xpIndicator = document.createElement("div");
 xpIndicator.style.cssText = `
@@ -161,7 +161,7 @@ statsFrame.appendChild(completeIndicator);
 const balloon = document.createElement("div");
 balloon.style.cssText = `
   user-select: none;
-  visibility: hidden;
+  opacity: 0;
   right: -75px;
   position: absolute;
   background: red;
@@ -202,7 +202,8 @@ let lvlReq = 2;
 let lastUpgradeReach = 0;
 const upgradePath = [
   "More seeds",
-  "Growth speed",
+  "Ground",
+  "More seeds",
   "Radio",
   "A lot more seeds",
   "A lot of growth speed",
@@ -229,6 +230,11 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+function playSound(url) {
+  const sound = new Audio(url);
+  sound.play();
+}
+
 function setPlantImage(url, object) {
   const img = new Image();
   img.src = url;
@@ -243,10 +249,10 @@ function setPlantImage(url, object) {
 
 async function balloons() {
   balloon.style.background = "red";
-  balloon.style.visibility = "visible";
-  await delay(1);
+  balloon.style.opacity = 1;
   balloon.style.right = "410px";
-  balloon.style.visibility = "hidden";
+  await delay(8000);
+  balloon.style.opacity = 0;
 }
 
 async function updateDisplays() {
@@ -281,8 +287,10 @@ async function updateDisplays() {
         spawnPlant();
         spawnPlant();
         spawnPlant();
+        spawnPlant();
         break;
       case "More seeds":
+        spawnPlant();
         spawnPlant();
         break;
       case "Growth speed":
@@ -312,10 +320,16 @@ async function updateDisplays() {
       case "balloons":
         growthSpeed += -200;
         spawnPlant();
+        spawnPlant();
+        spawnPlant();
         balloons();
         break;
       case "Mountains":
         mountain.style.opacity = "1";
+        break;
+      case "Ground":
+        growthSpeed += -200;
+        gardenFrame.style.backgroundPositionY = "";
         break;
     }
     lvl++;
@@ -339,7 +353,6 @@ const spawnPlant = async () => {
     user-select: none;
     cursor: pointer;
     position: absolute;
-    background: purple;
     width: 50px;
     height: 50px;
     bottom: 500px;
@@ -347,17 +360,17 @@ const spawnPlant = async () => {
     transform-origin: 50% 100% 0;
     opacity: 0;
     `;
+  setPlantImage("/assets/assetsSource/seed-bag.PNG", plantObj);
   plantObj.style.left = randomInt(0, 350) + "px";
   gardenFrame.appendChild(plantObj);
   await delay(10);
   plantObj.style.opacity = 1;
-  plantFall.play();
   plantObj.style.bottom = randomInt(20, 175) + "px";
   plantObj.style.zIndex = 175 - parseInt(plantObj.style.bottom);
   await delay(740);
-  hitGround.play();
+  playSound("audio/hitGround.wav");
   plantObj.onclick = async () => {
-    plantPlant.play();
+    playSound("audio/plant.wav");
     async function plantAnimation() {
       plantObj.style.backgroundSize = "100% 90%";
       await delay(200);
@@ -394,7 +407,7 @@ const spawnPlant = async () => {
     plantObj.style.cursor = "pointer";
     plantObj.onclick = async () => {
       plantObj.onclick = null;
-      plantCollect.play();
+      playSound("audio/collect.wav");
       if (plantsPlanted == 0) {
         flowersPlantedDisplay.innerText = "";
       }
@@ -412,7 +425,7 @@ const spawnPlant = async () => {
         flowersPlantedDisplay.innerText = `${plantsPlanted} plants grown`;
       }
       await updateDisplays();
-      await delay(2000);
+      await delay(850);
       spawnPlant();
       delete plants[id];
       plantObj.remove();
@@ -423,7 +436,11 @@ spawnPlant();
 
 //misc
 async function fixzoom() {
-  background.style.zoom = (250 * window.innerWidth) / 2507 + "%";
+  if (window.innerWidth > window.innerHeight) {
+    background.style.zoom = (250 * window.innerWidth) / 2507 + "%";
+  } else {
+    background.style.zoom = (600 * window.innerWidth) / 2507 + "%";
+  }
   await delay(100);
   fixzoom();
 }
