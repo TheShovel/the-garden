@@ -1,1 +1,1 @@
-Small garening game
+Small gardening game
