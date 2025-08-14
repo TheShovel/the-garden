@@ -542,3 +542,16 @@ async function fixzoom() {
   fixzoom();
 }
 fixzoom();
+
+function preloadImage(url) {
+  var img = new Image();
+  img.src = url;
+}
+preloadImage("assets/assetsSource/cool-flower.PNG");
+preloadImage("assets/assetsSource/dandelion.PNG");
+preloadImage("assets/assetsSource/flower.PNG");
+preloadImage("assets/assetsSource/grow1.PNG");
+preloadImage("assets/assetsSource/grow2.PNG");
+preloadImage("assets/assetsSource/mushroom.PNG");
+preloadImage("assets/assetsSource/rose.PNG");
+preloadImage("assets/assetsSource/sad-flower.PNG");
