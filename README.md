@@ -8,6 +8,8 @@ Features:
 - visuals drawn by hand by yours truly
 - smolhaj
 
+This game takes around 10 minutes to beat. It's not very long, but I hope you still enjoy it!
+
 ### Made as a project for The Summer of Making 2025!
 
 <img width="991" height="999" alt="image" src="https://github.com/user-attachments/assets/3c285094-105c-42b5-8ea9-a866e3c59cf8" />
