@@ -448,7 +448,7 @@ const spawnPlant = async () => {
     transform-origin: 50% 100% 0;
     opacity: 0;
     `;
-  setPlantImage("/assets/assetsSource/seed-bag.PNG", plantObj);
+  setPlantImage("assets/assetsSource/seed-bag.PNG", plantObj);
   plantObj.style.left = randomInt(0, 350) + "px";
   gardenFrame.appendChild(plantObj);
   await delay(10);
