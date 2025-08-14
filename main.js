@@ -7,7 +7,6 @@ const music = new Audio("audio/music.mp3");
 music.loop = true;
 
 // elements and stuff
-//
 const body = document.body;
 body.style.cssText = `
   user-select: none;
@@ -25,6 +24,12 @@ styleSheet.innerText = `
   0% { transform: rotate(0deg); }
   50% { transform: rotate(5deg); }
   100% { transform: rotate(-5deg); }
+}
+
+@keyframes clouds {
+  0% { transform: translateY(-5px); }
+  50% { transform: translateY(0px); }
+  100% { transform: translateY(5px); }
 }
 `;
 document.head.appendChild(styleSheet);
@@ -48,24 +53,31 @@ thesun.style.cssText = `
   user-select: none;
   left: 0px;
   position: absolute;
-  background: red;
   width: 125px;
-  height: 125px;
+  height: 140px;
   top: 0px;
-  transition: all 2s ease;
+  background: url("assets/assetsSource/sun.PNG");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  background-position-x: -11px;
+  background-position-y: -11px;
   `;
 background.appendChild(thesun);
 const mountain = document.createElement("div");
 mountain.style.cssText = `
   opacity: 0;
   user-select: none;
-  right: 0px;
-  top: 60px;
+  right: -20px;
+  top: 10px;
   position: absolute;
-  background: blue;
-  width: 100%;
-  height: 140px;
-  transition: all 2s ease;
+  width: 400px;
+  height: 200px;
+  background: url("assets/assetsSource/mountains.PNG");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  background-position-x: -11px;
   `;
 
 const fence = document.createElement("div");
@@ -78,24 +90,72 @@ fence.style.cssText = `
   background: blue;
   width: 100%;
   height: 80px;
-  transition: all 2s ease;
+  background: url("assets/assetsSource/fence.PNG");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  background-position-y: 11px;
+  `;
+const smolhaj = document.createElement("div");
+smolhaj.style.cssText = `
+  opacity: 0;
+  user-select: none;
+  right: 15px;
+  top: 160px;
+  position: absolute;
+  background: cyan;
+  width: 100px;
+  height: 60px;
+  background: url("assets/assetsSource/smolhaj.PNG");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  pointer-events: none;
+  `;
+
+const radio = document.createElement("div");
+radio.style.cssText = `
+  opacity: 0;
+  user-select: none;
+  right: 10px;
+  top: 175px;
+  position: absolute;
+  background: red;
+  width: 60px;
+  height: 50px;
+  background: url("assets/assetsSource/radio.PNG");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  pointer-events: none;
   `;
 const gardenFrame = document.createElement("div");
 gardenFrame.style.cssText = `
   user-select: none;
   position: absolute;
-  background: url(assets/assetsSource/ground.PNG);
   width: 100%;
   height: 230px;
+  `;
+const ground = document.createElement("div");
+ground.style.cssText = `
+  opacity: 0;
+  user-select: none;
+  position: absolute;
+  width: 100%;
+  height: 230px;
+  background: url(assets/assetsSource/ground.PNG);
   background-size: 108% 100%;
   background-repeat: no-repeat;
   transition: all 5s ease;
   background-position-x: -11px;
-  background-position-y: -250px;
   `;
+
 background.appendChild(mountain);
 background.appendChild(fence);
+background.appendChild(ground);
 background.appendChild(gardenFrame);
+background.appendChild(smolhaj);
+background.appendChild(radio);
 
 const statsFrame = document.createElement("div");
 statsFrame.style.cssText = `
@@ -108,6 +168,7 @@ statsFrame.style.cssText = `
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 5s ease;
   `;
 background.appendChild(statsFrame);
 const flowersPlantedDisplay = document.createElement("div");
@@ -164,11 +225,14 @@ balloon.style.cssText = `
   opacity: 0;
   right: -75px;
   position: absolute;
-  background: red;
+  background: url(assets/assetsSource/balloon.PNG);
   width: 75px;
   height: 75px;
   top: 50px;
-  transition: all 15s linear;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 25s ease;
+  animation: clouds 1s ease-in-out infinite alternate;
   `;
 
 const clouds = document.createElement("div");
@@ -179,9 +243,13 @@ clouds.style.cssText = `
   top: 40px;
   position: absolute;
   background: blue;
-  width: 100%;
-  height: 125px;
-  transition: all 2s ease;
+  width: 300px;
+  height: 100px;
+  background: url("assets/assetsSource/clouds.PNG");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transition: all 5s ease;
+  animation: clouds 3s ease-in-out infinite alternate;
   `;
 
 background.appendChild(clouds);
@@ -197,6 +265,7 @@ plantTypes = [
   "sad-flower",
   "cool-flower",
 ];
+let plantMultiplier = 1;
 let plantsPlanted = 0;
 let lvlReq = 2;
 let lastUpgradeReach = 0;
@@ -209,13 +278,13 @@ const upgradePath = [
   "A lot of growth speed",
   "The sun",
   "More seeds",
+  "x2 multiplier",
   "Growth speed",
   "Clouds",
-  "A lot more seeds",
   "balloons",
   "Fence",
   "A lot more seeds",
-  "A lot of growth speed",
+  "x4 multiplier",
   "Mountains",
   "Friend shark",
   "Final stretch",
@@ -248,11 +317,14 @@ function setPlantImage(url, object) {
 }
 
 async function balloons() {
-  balloon.style.background = "red";
   balloon.style.opacity = 1;
   balloon.style.right = "410px";
   await delay(8000);
   balloon.style.opacity = 0;
+  await delay(12000);
+  balloon.style.right = "-75px";
+  await delay(16000);
+  balloons();
 }
 
 async function updateDisplays() {
@@ -276,11 +348,14 @@ async function updateDisplays() {
     "/Progress: " +
     Math.floor(100 - ((upgradePath.length - lvl) / upgradePath.length) * 100) +
     "%/";
-  xpIndicator.style.opacity = 1;
+  if (lvl > upgradePath.length - 1) {
+  } else {
+    xpIndicator.style.opacity = 1;
+  }
 
   if (plantsPlanted >= lvlReq) {
     lastUpgradeReach = plantsPlanted;
-    lvlReq += Math.ceil(lvlReq / 2);
+    lvlReq += Math.min(Math.ceil(lvlReq / 2), 100);
     await delay(1000);
     switch (upgradeType) {
       case "A lot more seeds":
@@ -300,6 +375,7 @@ async function updateDisplays() {
         growthSpeed += -200;
         break;
       case "Radio":
+        radio.style.opacity = 1;
         completeIndicator.style.opacity = 1;
         music.play();
         break;
@@ -329,13 +405,25 @@ async function updateDisplays() {
         break;
       case "Ground":
         growthSpeed += -200;
-        gardenFrame.style.backgroundPositionY = "";
+        ground.style.opacity = "1";
+        break;
+      case "Friend shark":
+        smolhaj.style.opacity = "1";
+        spawnPlant();
+        growthSpeed += -200;
+        break;
+      case "x2 multiplier":
+        plantMultiplier = 2;
+        break;
+      case "x4 multiplier":
+        plantMultiplier = 4;
         break;
     }
     lvl++;
     if (lvl > upgradePath.length - 1) {
-      console.log("Reached end of upgrade path");
       const endGameUpgrades = ["More seeds", "Growth speed"];
+      completeIndicator.style.opacity = "0";
+      xpIndicator.style.opacity = "0";
       upgradeType = endGameUpgrades[randomInt(0, endGameUpgrades.length - 1)];
     } else {
       upgradeType = upgradePath[lvl];
@@ -406,6 +494,7 @@ const spawnPlant = async () => {
 
     plantObj.style.cursor = "pointer";
     plantObj.onclick = async () => {
+      plantObj.style.cursor = "";
       plantObj.onclick = null;
       playSound("audio/collect.wav");
       if (plantsPlanted == 0) {
@@ -418,14 +507,18 @@ const spawnPlant = async () => {
       plantObj.style.width = "20px";
       plantObj.style.height = "80px";
       plantObj.style.opacity = "0";
-      plantsPlanted++;
-      if (plantsPlanted == 1) {
-        flowersPlantedDisplay.innerText = `${plantsPlanted} plant grown`;
+      plantsPlanted += plantMultiplier;
+      if (lvl > upgradePath.length - 1) {
+        flowersPlantedDisplay.innerText = `You did it! Thank you for playing <3`;
       } else {
-        flowersPlantedDisplay.innerText = `${plantsPlanted} plants grown`;
+        if (plantsPlanted == 1) {
+          flowersPlantedDisplay.innerText = `${plantsPlanted} plant grown`;
+        } else {
+          flowersPlantedDisplay.innerText = `${plantsPlanted} plants grown`;
+        }
       }
       await updateDisplays();
-      await delay(850);
+      await delay(750);
       spawnPlant();
       delete plants[id];
       plantObj.remove();
@@ -437,8 +530,12 @@ spawnPlant();
 //misc
 async function fixzoom() {
   if (window.innerWidth > window.innerHeight) {
+    background.style.bottom = "100px";
+
     background.style.zoom = (250 * window.innerWidth) / 2507 + "%";
   } else {
+    //scaling if you play on half the monitor
+    background.style.bottom = "";
     background.style.zoom = (600 * window.innerWidth) / 2507 + "%";
   }
   await delay(100);
